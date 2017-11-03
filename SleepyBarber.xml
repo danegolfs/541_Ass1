@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+
+chan done, sit;
+int seat;
+int [0,1] seated;
+clock time;</declaration>
+	<template>
+		<name x="5" y="5">Customer</name>
+		<parameter>int delay</parameter>
+		<declaration>// Place local declarations here.
+clock x;</declaration>
+		<location id="id0" x="-221" y="0">
+			<name x="-323" y="-34">outsideBarb</name>
+		</location>
+		<location id="id1" x="272" y="306">
+			<name x="280" y="331">cut</name>
+		</location>
+		<location id="id2" x="272" y="136">
+			<name x="306" y="119">takeTurn</name>
+			<committed/>
+		</location>
+		<location id="id3" x="272" y="0">
+			<name x="297" y="-25">waiting</name>
+		</location>
+		<location id="id4" x="0" y="0">
+			<name x="-34" y="-42">insideBarb</name>
+		</location>
+		<init ref="id4"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-357" y="25">x&lt;delay</label>
+			<nail x="-289" y="0"/>
+			<nail x="-289" y="68"/>
+			<nail x="-221" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-170" y="59">x&gt;delay</label>
+			<nail x="-102" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-136" y="-59">seat &gt;= 3</label>
+			<label kind="assignment" x="-127" y="-25">x = 0</label>
+			<nail x="-102" y="-34"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="18" y="136">done?</label>
+			<label kind="assignment" x="18" y="153">seated = 0</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="289" y="195">sit!</label>
+			<label kind="assignment" x="289" y="212">seated = 1</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<label kind="guard" x="289" y="59">seated == 0</label>
+			<label kind="assignment" x="289" y="76">seat = seat - 1</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="guard" x="110" y="-25">seat&lt;3</label>
+			<label kind="assignment" x="110" y="0">seat = seat + 1</label>
+		</transition>
+	</template>
+	<template>
+		<name>Barber</name>
+		<declaration>clock y;</declaration>
+		<location id="id5" x="204" y="0">
+			<name x="221" y="-8">cut</name>
+		</location>
+		<location id="id6" x="0" y="0">
+			<name x="-76" y="-17">sleep</name>
+		</location>
+		<init ref="id6"/>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id6"/>
+			<label kind="guard" x="136" y="51">y &gt; 20</label>
+			<label kind="synchronisation" x="34" y="51">done!</label>
+			<nail x="102" y="68"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="85" y="-25">sit?</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="280" y="-8">y &lt;= 20</label>
+			<nail x="272" y="-68"/>
+			<nail x="272" y="68"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+barb = Barber();
+cust1 = Customer(5);
+cust2 = Customer(10);
+cust3 = Customer(15);
+cust4 = Customer(20);
+// List one or more processes to be composed into a system.
+system barb, cust1, cust2, cust3, cust4;
+    </system>
+	<queries>
+		<query>
+			<formula>E&lt;&gt; cust4.cut
+			</formula>
+			<comment>
+			</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; cust3.cut
+			</formula>
+			<comment>
+			</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; cust2.cut
+			</formula>
+			<comment>
+			</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; cust1.cut
+			</formula>
+			<comment>
+			</comment>
+		</query>
+		<query>
+			<formula>A[] not deadlock
+			</formula>
+			<comment>
+			</comment>
+		</query>
+	</queries>
+</nta>
