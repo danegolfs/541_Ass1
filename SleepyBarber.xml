@@ -3,13 +3,16 @@
 <nta>
 	<declaration>// Place global declarations here.
 
+const int N = 6;
+typedef int[0, N-1] id_t;
+
 chan done, sit;
 int seat;
 int [0,1] seated;
 clock time;</declaration>
 	<template>
 		<name x="5" y="5">Customer</name>
-		<parameter>int delay</parameter>
+		<parameter>const id_t delay</parameter>
 		<declaration>// Place local declarations here.
 clock x;</declaration>
 		<location id="id0" x="-221" y="0">
@@ -28,7 +31,14 @@ clock x;</declaration>
 		<location id="id4" x="0" y="0">
 			<name x="-34" y="-42">insideBarb</name>
 		</location>
-		<init ref="id4"/>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-152" y="238">done?</label>
+			<label kind="assignment" x="-152" y="255">seated=0</label>
+			<nail x="-170" y="204"/>
+		</transition>
 		<transition>
 			<source ref="id0"/>
 			<target ref="id0"/>
@@ -49,12 +59,6 @@ clock x;</declaration>
 			<label kind="guard" x="-136" y="-59">seat &gt;= 3</label>
 			<label kind="assignment" x="-127" y="-25">x = 0</label>
 			<nail x="-102" y="-34"/>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id4"/>
-			<label kind="synchronisation" x="18" y="136">done?</label>
-			<label kind="assignment" x="18" y="153">seated = 0</label>
 		</transition>
 		<transition>
 			<source ref="id2"/>
@@ -78,28 +82,43 @@ clock x;</declaration>
 	<template>
 		<name>Barber</name>
 		<declaration>clock y;</declaration>
-		<location id="id5" x="204" y="0">
+		<location id="id5" x="-170" y="0">
+			<name x="-221" y="-25">sleep</name>
+		</location>
+		<location id="id6" x="204" y="0">
 			<name x="221" y="-8">cut</name>
 		</location>
-		<location id="id6" x="0" y="0">
-			<name x="-76" y="-17">sleep</name>
+		<location id="id7" x="0" y="0">
+			<name x="-8" y="-42">check</name>
 		</location>
-		<init ref="id6"/>
+		<init ref="id7"/>
 		<transition>
 			<source ref="id5"/>
 			<target ref="id6"/>
+			<label kind="synchronisation" x="-76" y="-85">sit?</label>
+			<nail x="34" y="-102"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-102" y="8">seat == 0</label>
+			<nail x="-76" y="0"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id7"/>
 			<label kind="guard" x="136" y="51">y &gt; 20</label>
 			<label kind="synchronisation" x="34" y="51">done!</label>
 			<nail x="102" y="68"/>
 		</transition>
 		<transition>
-			<source ref="id6"/>
-			<target ref="id5"/>
+			<source ref="id7"/>
+			<target ref="id6"/>
 			<label kind="synchronisation" x="85" y="-25">sit?</label>
 		</transition>
 		<transition>
-			<source ref="id5"/>
-			<target ref="id5"/>
+			<source ref="id6"/>
+			<target ref="id6"/>
 			<label kind="guard" x="280" y="-8">y &lt;= 20</label>
 			<nail x="272" y="-68"/>
 			<nail x="272" y="68"/>
@@ -107,40 +126,42 @@ clock x;</declaration>
 	</template>
 	<system>// Place template instantiations here.
 barb = Barber();
-cust1 = Customer(5);
-cust2 = Customer(10);
-cust3 = Customer(15);
-cust4 = Customer(20);
 // List one or more processes to be composed into a system.
-system barb, cust1, cust2, cust3, cust4;
+system barb, Customer;
     </system>
 	<queries>
 		<query>
-			<formula>E&lt;&gt; cust4.cut
+			<formula>E&lt;&gt; Customer(3).cut
 			</formula>
 			<comment>
 			</comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; cust3.cut
+			<formula>E&lt;&gt; Customer(2).cut
 			</formula>
 			<comment>
 			</comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; cust2.cut
+			<formula>E&lt;&gt; Customer(1).cut
 			</formula>
 			<comment>
 			</comment>
 		</query>
 		<query>
-			<formula>E&lt;&gt; cust1.cut
+			<formula>E&lt;&gt; Customer(0).cut
 			</formula>
 			<comment>
 			</comment>
 		</query>
 		<query>
 			<formula>A[] not deadlock
+			</formula>
+			<comment>
+			</comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; not seat ==0 and barb.sleep
 			</formula>
 			<comment>
 			</comment>
